@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Training – Fitness Park</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9ECEF; --card:#FFFFFF; --ink:#1C2630; --muted:#5B6773;
+  --steel:#2E3D4C; --plate:#F2C230; --done:#2F7D5B; --line:#D3D9DF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#151C23; --card:#1E2730; --ink:#EEF1F4; --muted:#9AA6B2;
+    --steel:#0F151B; --line:#2E3A46;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151C23; --card:#1E2730; --ink:#EEF1F4; --muted:#9AA6B2;
+  --steel:#0F151B; --line:#2E3A46;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; padding-bottom:100px;
+}
+header{background:var(--steel); color:#fff; padding:22px 18px 16px}
+header h1{
+  font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:800;
+  font-size:2.4rem; line-height:.95; margin:0;
+}
+header p{margin:6px 0 0; color:#C9D2DB; font-size:.95rem}
+nav{display:flex; gap:6px; margin-top:14px; flex-wrap:wrap}
+nav button{
+  background:rgba(255,255,255,.12); color:#fff; border:0; border-radius:6px;
+  padding:9px 13px; font:600 .95rem "Barlow",sans-serif; cursor:pointer;
+}
+nav button.on{background:var(--plate); color:#1C2630}
+main{max-width:640px; margin:0 auto; padding:16px}
+.block{background:var(--card); border-radius:10px; padding:16px; margin-bottom:12px; border-left:6px solid var(--line)}
+.block.ex{border-left-color:var(--plate)}
+.block.ex.complete{border-left-color:var(--done)}
+h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:600; font-size:1.45rem; line-height:1.1; margin:0}
+.num{color:var(--muted); margin-right:6px}
+.machine{color:var(--muted); font-size:.92rem; margin:2px 0 8px}
+.target{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-size:1.15rem; font-weight:600; margin:0 0 8px}
+.target small{font-family:"Barlow",sans-serif; font-weight:400; font-size:.88rem; color:var(--muted)}
+.cue{font-size:.93rem; color:var(--muted); margin:0 0 6px}
+table.sets{width:100%; border-collapse:collapse; margin-top:8px}
+table.sets th{font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600; text-align:left; padding:0 6px 4px 0}
+table.sets td{padding:4px 6px 4px 0}
+.chk{
+  width:42px; height:42px; border-radius:50%; border:3px solid var(--plate);
+  background:transparent; color:var(--ink); font:600 1rem "Barlow",sans-serif; cursor:pointer;
+}
+.chk[aria-pressed="true"]{background:var(--done); border-color:var(--done); color:#fff}
+input[type=number],input[type=text],textarea{
+  width:100%; padding:9px; border:1px solid var(--line); border-radius:6px;
+  background:var(--bg); color:var(--ink); font:inherit;
+}
+input[type=number]{text-align:center; max-width:82px}
+textarea{min-height:150px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85rem}
+button.act{
+  background:var(--steel); color:#fff; border:0; border-radius:6px;
+  padding:11px 15px; font:600 .95rem "Barlow",sans-serif; cursor:pointer; margin:4px 4px 0 0;
+}
+button.act.ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.hint{font-size:.88rem; color:var(--muted)}
+.mus{font-size:.9rem; color:var(--ink); margin:6px 0}
+.grp{margin:18px 0 6px; font-family:'Barlow Condensed',sans-serif; font-size:1.25rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); border-bottom:2px solid var(--plate); padding-bottom:4px}
+.grp:first-child{margin-top:0}
+.prev{border-left:3px solid var(--plate); padding:6px 10px; margin:8px 0; background:rgba(242,194,48,.10); border-radius:0 6px 6px 0}
+.lib{width:100%; border-collapse:collapse; font-size:.9rem}
+.lib td{padding:5px 8px 5px 0; border-bottom:1px solid var(--line); vertical-align:top}
+.lib td:first-child{font-weight:600; white-space:nowrap; color:var(--plate)}
+.tag{display:inline-block; background:var(--bg); border-radius:4px; padding:1px 7px; font-size:.78rem; color:var(--muted); margin-left:6px}
+details.exd{padding:4px 0}
+details.exd summary{cursor:pointer; list-style:none; padding:6px 0}
+details.exd summary::-webkit-details-marker{display:none}
+details.exd summary::before{content:"▸"; color:var(--plate); margin-right:8px; font-size:.9rem}
+details.exd[open] summary::before{content:"▾"}
+.code{display:inline-block; background:var(--plate); color:#1C2630; border-radius:4px; padding:1px 7px; font-weight:600; font-size:.85rem; margin-right:6px}
+ol.steps{margin:6px 0 4px; padding-left:22px; font-size:.94rem}
+ol.steps li{margin-bottom:5px}
+.warn{font-size:.9rem; color:var(--muted); background:var(--bg); border-radius:6px; padding:8px 10px; margin:6px 0 10px}
+.lib td:first-child{font-weight:600}
+.run{background:var(--plate); color:#1C2630; border:0; border-radius:6px; padding:9px 11px; font-size:1rem; cursor:pointer; vertical-align:middle}
+#timer{
+  position:fixed; left:0; right:0; bottom:0; background:var(--steel); color:#fff;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+  display:flex; align-items:center; gap:12px; justify-content:center;
+}
+#clock{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:800; font-size:1.8rem; min-width:72px; text-align:center}
+#clock.go{color:var(--plate)}
+#timer button{background:rgba(255,255,255,.12); color:#fff; border:0; border-radius:6px; padding:9px 12px; font:600 .9rem "Barlow",sans-serif; cursor:pointer}
+#label{font-size:.88rem; color:#C9D2DB; flex:1}
+.hidden{display:none}
+.hist{border-bottom:1px solid var(--line); padding:8px 0}
+.hist b{font-family:"Barlow Condensed",sans-serif; font-size:1.1rem}
+:focus-visible{outline:3px solid #3B82C4; outline-offset:2px}
+</style>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#2E3D4C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+</script>
+</head>
+<body>
+<header>
+  <h1>Training</h1>
+  <p>Charge une séance avec son code, note tes perfs, exporte le tout.</p>
+  <nav>
+    <button data-tab="seance" class="on">Séance</button>
+    <button data-tab="code">Code</button>
+    <button data-tab="prog">Progression</button>
+    <button data-tab="histo">Historique</button>
+    <button data-tab="lib">Exercices</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ONGLET CODE -->
+  <section id="tab-code" class="hidden">
+    <div class="block">
+      <h2>Charger une séance</h2>
+      <p class="hint">Colle le code que je te donne (groupes de 6 chiffres), puis valide.</p>
+      <input type="text" id="codeIn" placeholder="010410-8 020312-5 ..." autocomplete="off">
+      <div class="row">
+        <button class="act" id="loadBtn">Charger</button>
+        <button class="act ghost" id="demoBtn">Exemple</button>
+      </div>
+      <p class="hint" id="codeMsg"></p>
+    </div>
+    <div class="block">
+      <h2>Format du code</h2>
+      <p class="hint">Chaque exercice = 6 chiffres : <b>EE S RR T</b>, ou 9 chiffres avec la charge : <b>EE S RR T KKK</b></p>
+      <ul class="hint">
+        <li><b>EE</b> : numéro de l'exercice (voir l'onglet Exercices)</li>
+        <li><b>S</b> : nombre de séries</li>
+        <li><b>RR</b> : répétitions (ou secondes pour le gainage)</li>
+        <li><b>T</b> : repos, en tranches de 15 s (4 = 60 s, 6 = 90 s, 8 = 120 s)</li>
+        <li><b>KKK</b> : charge conseillée en kg (facultatif, 3 chiffres : 065 = 65 kg)</li>
+      </ul>
+      <p class="hint">Exemples : <b>014108</b> = exercice 01, 4 séries de 10, 2 min de repos. <b>014108065</b> = pareil, avec 65 kg visés.</p>
+      <p class="hint">Sépare bien les groupes par un espace quand tu utilises les charges.</p>
+    </div>
+  </section>
+
+  <!-- ONGLET SEANCE -->
+  <section id="tab-seance"></section>
+
+  <!-- ONGLET HISTORIQUE -->
+  <section id="tab-histo" class="hidden">
+    <div class="block">
+      <h2>Exporter mes perfs</h2>
+      <p class="hint">Télécharge le fichier .txt, ou copie le texte et colle-le-moi dans la conversation.</p>
+      <div class="row">
+        <button class="act" id="dlBtn">Télécharger .txt</button>
+        <button class="act ghost" id="copyBtn">Copier</button>
+        <button class="act ghost" id="clearBtn">Tout effacer</button>
+      </div>
+      <textarea id="exportBox" readonly></textarea>
+    </div>
+    <div class="block">
+      <h2>Séances enregistrées</h2>
+      <div id="histList"></div>
+    </div>
+  </section>
+
+  <!-- ONGLET BIBLIOTHEQUE -->
+  <!-- ONGLET PROGRESSION -->
+  <section id="tab-prog" class="hidden">
+    <div class="block">
+      <h2>Progression</h2>
+      <p class="hint">Clique sur un exercice pour voir la courbe de tes charges, séance après séance.</p>
+      <div id="progList"></div>
+    </div>
+  </section>
+
+  <section id="tab-lib" class="hidden">
+    <div class="block">
+      <h2>Liste des exercices</h2>
+      <div id="libTable"></div>
+    </div>
+  </section>
+</main>
+
+<div id="timer" role="timer" aria-live="polite">
+  <div id="clock">0:00</div>
+  <div id="label">Coche une série pour lancer le repos</div>
+  <button id="resetT" type="button">Stop</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- BIBLIOTHEQUE D'EXERCICES ---------- */
+var EX = {
+  // POUSSER
+  '01':{cat:"Pectoraux",mu:"Pectoraux (grand pectoral) — aussi triceps et faisceau avant de l'épaule",n:"Chest Press",m:"Presse pectoraux assise",g:"Pecs",c:"Poignées au milieu de la poitrine, omoplates serrées, sans verrouiller les coudes.",
+    d:["Règle le siège pour que les poignées arrivent au milieu de la poitrine, pas au niveau du cou.","Assieds-toi, dos et tête collés au dossier, pieds bien à plat au sol.","Serre les omoplates vers l'arrière et vers le bas : elles ne bougent plus de la série.","Pousse les poignées vers l'avant en expirant, coudes à 45° du corps, sans les verrouiller en fin de mouvement.","Reviens en 2 à 3 secondes jusqu'à sentir l'étirement des pecs, sans laisser la charge taper."],
+    e:"Erreur classique : décoller les épaules du dossier pour pousser plus lourd."},
+  '02':{cat:"Pectoraux",mu:"Haut des pectoraux — aussi faisceau avant de l'épaule et triceps",n:"Incline Chest Press",m:"Presse pectoraux inclinée / développé incliné",g:"Haut des pecs",c:"Coudes sous la ligne des épaules, descente lente.",
+    d:["Banc ou dossier à environ 30°, pas plus, sinon ça devient un exercice d'épaules.","Poignées ou barre au niveau du haut de la poitrine, sous les clavicules.","Omoplates serrées, pieds au sol, fesses toujours en contact avec le banc.","Pousse vers le haut et légèrement vers l'arrière, sans verrouiller les coudes.","Descends lentement jusqu'au haut des pecs, coudes à 45-60° du corps."],
+    e:"En barre libre, garde 2 reps en réserve : il n'y a pas toujours de sécurité pour rattraper."},
+  '03':{cat:"Épaules",mu:"Deltoïde avant et latéral — aussi triceps et trapèzes",n:"Shoulder Press",m:"Presse épaules",g:"Épaules",c:"Poignées à hauteur d'épaules, abdos serrés, pas de cambrure.",
+    d:["Règle le siège pour que les poignées soient à hauteur des épaules au départ.","Dos plaqué au dossier, abdos serrés, menton légèrement rentré.","Pousse droit vers le haut, au-dessus des épaules et pas vers l'avant.","Arrête-toi juste avant de verrouiller les coudes.","Redescends en contrôlant jusqu'à ce que les mains soient à hauteur du menton."],
+    e:"Si tu dois cambrer le bas du dos pour finir la série, la charge est trop lourde."},
+  '04':{cat:"Pectoraux",mu:"Pectoraux (isolation, surtout la partie interne)",n:"Pec Deck",m:"Butterfly / Pec Fly",g:"Pecs",c:"Bras légèrement fléchis et fixes, contraction 1 s devant.",
+    d:["Siège réglé pour que les poignées soient à hauteur de poitrine.","Dos collé au dossier, bras légèrement fléchis et surtout fixes : l'angle du coude ne change pas.","Ramène les bras l'un vers l'autre devant toi en expirant.","Serre les pecs 1 seconde quand les mains sont proches.","Ouvre lentement, sans aller trop loin en arrière pour protéger l'épaule."],
+    e:"Ce n'est pas une poussée : si tes coudes se plient et se tendent, tu fais du chest press."},
+  '05':{cat:"Épaules",mu:"Deltoïde latéral (isolation) — un peu de sus-épineux",n:"Lateral Raise",m:"Élévations latérales machine ou poulie",g:"Deltoïde latéral",c:"Épaules basses, monte jusqu'à l'horizontale, charge légère.",
+    d:["Coudes contre les coussins, buste droit, épaules basses.","Monte les bras sur les côtés jusqu'à hauteur d'épaules, pas plus haut.","Marque un temps court en haut, sans hausser les épaules vers les oreilles.","Redescends lentement, sans laisser la charge tomber.","Charge légère : c'est un petit muscle, on cherche la sensation, pas le poids."],
+    e:"Monter au-dessus de l'horizontale fait travailler les trapèzes à la place des épaules."},
+  '06':{cat:"Bras",mu:"Triceps (les 3 faisceaux, surtout le latéral)",n:"Triceps Pushdown",m:"Poulie haute avec corde",g:"Triceps",c:"Coudes collés au corps et immobiles.",
+    d:["Face à la poulie haute, un pied légèrement en avant, buste très légèrement penché.","Coudes collés au corps : ils ne bougent plus de toute la série.","Pousse la corde vers le bas en tendant les bras.","Écarte légèrement les mains en fin de mouvement et serre les triceps 1 seconde.","Remonte jusqu'à ce que les avant-bras soient à l'horizontale, pas plus haut."],
+    e:"Si tes épaules et ton dos participent, recule d'un pas et baisse la charge."},
+  '07':{cat:"Bras",mu:"Triceps — aussi bas des pectoraux et épaule avant",n:"Dips machine",m:"Triceps Press assis",g:"Triceps",c:"Buste droit, descente contrôlée.",
+    d:["Règle le siège pour que les poignées soient au niveau du bas de la poitrine.","Dos droit contre le dossier, coudes le long du corps.","Pousse vers le bas en tendant les bras, sans verrouiller.","Remonte lentement jusqu'à ce que les coudes forment 90°.","Garde les épaules basses, sans t'affaisser dedans."],
+    e:"Penchier le buste en avant transforme l'exercice en travail de pecs."},
+  '08':{cat:"Pectoraux",mu:"Pectoraux — aussi triceps et faisceau avant de l'épaule",n:"Développé couché",m:"Barre ou Smith Machine",g:"Pecs",c:"Pieds au sol, omoplates serrées, garde 2 reps en réserve.",
+    d:["Allonge-toi les yeux à peu près sous la barre, pieds bien à plat au sol.","Serre les omoplates vers l'arrière et vers le bas, poitrine sortie.","Prise un peu plus large que les épaules, colliers mis.","Sors la barre et amène-la au-dessus du milieu de la poitrine, bras tendus.","Descends en 2 à 3 s jusqu'aux pecs, coudes à 45-60°, puis pousse en expirant."],
+    e:"Sans pareur ni barres de sécurité, arrête-toi à 2 reps de l'échec."},
+  // TIRER
+  '09':{cat:"Dos",mu:"Grand dorsal — aussi biceps, grand rond et trapèze inférieur",n:"Lat Pulldown poulie",m:"Tirage vertical à la poulie haute (barre libre au câble)",g:"Dos",c:"Barre libre : charges plus légères qu'à la machine, buste bien fixe.",
+    d:["Cale tes cuisses sous les boudins, assieds-toi bien au fond.","Prise large, paumes vers l'avant, barre décrochée de la poulie haute.","Sors la poitrine, léger recul du buste (10 à 20°) et garde-le fixe tout du long.","Tire la barre vers le haut de la poitrine en descendant les coudes.","Serre les omoplates en bas, puis laisse remonter en 3 s bras presque tendus."],
+    e:"La barre libre bouge dans tous les sens : les charges sont normalement plus basses qu'à la machine guidée, c'est normal."},
+  '10':{cat:"Dos",mu:"Grand dorsal — aussi biceps, grand rond et trapèze inférieur",n:"Lat Pulldown machine",m:"Tirage vertical guidé, poignées sur bras articulés",g:"Dos",c:"Tire les coudes vers le bas, poitrine sortie, pas d'élan.",
+    d:["Cale bien tes cuisses sous les boudins pour ne pas décoller du siège.","Prise large, mains un peu plus écartées que les épaules, paumes vers l'avant.","Sors la poitrine, léger recul du buste (10 à 20°), et garde-le fixe.","Tire la barre vers le haut de la poitrine en pensant à descendre les coudes, pas à tirer avec les mains.","Serre les omoplates en bas, puis laisse remonter en 3 s bras presque tendus."],
+    e:"Jamais derrière la nuque, et pas de balancement du buste pour lancer la barre."},
+  '11':{cat:"Dos",mu:"Milieu du dos (rhomboïdes, trapèze moyen) et grand dorsal — aussi biceps",n:"Seated Row",m:"Tirage horizontal assis",g:"Dos",c:"Dos droit, ramène les coudes le long du corps, serre les omoplates.",
+    d:["Pieds calés, genoux légèrement fléchis, dos droit et poitrine sortie.","Attrape la poignée bras tendus, sans t'avachir vers l'avant.","Tire en ramenant les coudes le long du corps jusqu'au niveau du nombril.","Serre les omoplates 1 seconde en fin de tirage.","Reviens lentement en laissant les bras s'étendre, sans arrondir le dos."],
+    e:"Le buste reste fixe : s'il part en arrière à chaque rep, la charge est trop lourde."},
+  '12':{cat:"Dos",mu:"Grand dorsal et milieu du dos — aussi biceps et avant-bras",n:"Low Row machine",m:"Rowing machine à disques",g:"Dos",c:"Poitrine contre le coussin, mouvement complet.",
+    d:["Règle le siège pour que les poignées soient à hauteur du nombril.","Poitrine collée au coussin pendant toute la série.","Tire les poignées vers toi, coudes près du corps.","Serre les omoplates en fin de mouvement.","Reviens en contrôlant jusqu'à l'étirement complet du dos."],
+    e:"Décoller la poitrine du coussin fait travailler les lombaires à la place du dos."},
+  '13':{cat:"Épaules",mu:"Deltoïde arrière — aussi rhomboïdes et trapèze moyen",n:"Rear Delt (Reverse Fly)",m:"Pec Deck inversé, assis face au dossier",g:"Arrière d'épaule",c:"Bras tendus, ouvre sans hausser les épaules.",
+    d:["Amène les poignées vers l'avant (goupille ou levier), puis assieds-toi FACE au dossier.","Poitrine collée au coussin, pieds au sol.","Attrape les poignées bras tendus devant toi, paumes qui se font face.","Écarte les bras vers l'extérieur, comme si tu ouvrais des volets.","Arrête-toi quand les bras sont dans l'alignement des épaules, serre les omoplates, puis reviens lentement."],
+    e:"Ne hausse pas les épaules vers les oreilles : charge légère, 12 à 15 reps."},
+  '14':{cat:"Bras",mu:"Biceps brachial (isolation) — aussi brachial antérieur",n:"Biceps Curl machine",m:"Curl pupitre / machine biceps",g:"Biceps",c:"Coudes calés, descente lente jusqu'à l'étirement.",
+    d:["Règle le siège pour que tes aisselles soient posées en haut du pupitre.","Coudes bien calés sur le coussin, écartés à largeur d'épaules.","Monte les poignées vers les épaules en expirant.","Serre les biceps 1 seconde en haut.","Descends en 3 s jusqu'à bras presque tendus, sans lâcher la charge d'un coup."],
+    e:"Les coudes ne décollent jamais du coussin, même sur la dernière rep."},
+  '15':{cat:"Bras",mu:"Biceps brachial — aussi avant-bras",n:"Biceps poulie",m:"Curl à la poulie basse (barre ou corde)",g:"Biceps",c:"Coudes fixes le long du corps.",
+    d:["Debout face à la poulie basse, pieds à largeur de bassin, abdos serrés.","Coudes collés aux côtes, ils restent fixes.","Monte la barre vers la poitrine en gardant les poignets droits.","Serre 1 seconde en haut.","Descends lentement jusqu'à bras tendus."],
+    e:"Pas de balancement du buste : si tu recules le dos, baisse la charge."},
+  '18':{cat:"Bras",mu:"Biceps brachial, chaque bras indépendamment — aussi brachial et avant-bras",n:"Curl haltères",m:"Haltères, debout ou assis",g:"Biceps",c:"Coudes fixes le long du corps, pas de balancement du buste.",
+    d:["Debout, pieds à largeur de bassin, ou assis au bord d'un banc, un haltère dans chaque main.","Bras le long du corps, coudes collés aux côtes : ils restent fixes.","Monte l'haltère vers l'épaule en tournant légèrement le poignet (paume vers le haut en fin de montée).","Serre le biceps 1 seconde en haut.","Descends en 2 à 3 s jusqu'à bras tendu, puis change de bras ou monte les deux ensemble."],
+    e:"Si le buste se balance pour lancer la charge, baisse le poids : le dos reste immobile."},
+  '16':{cat:"Épaules",mu:"Deltoïde arrière, rhomboïdes et rotateurs externes de l'épaule",n:"Face Pull",m:"Poulie haute avec corde, tirage au visage",g:"Arrière d'épaule",c:"Tire vers le front, écarte les mains en fin de mouvement.",
+    d:["Corde attachée en haut de la poulie, à hauteur de visage.","Prise neutre, pouces vers toi, recule de deux pas pour mettre la corde en tension.","Tire la corde vers ton front en écartant les mains.","Les coudes restent hauts, au niveau des épaules.","Reviens lentement bras tendus, sans laisser les épaules partir en avant."],
+    e:"Charge légère : c'est un exercice de santé d'épaule, pas de force."},
+  '19':{cat:"Épaules",mu:"Deltoïde arrière — aussi rhomboïdes, trapèze moyen et lombaires en gainage",n:"Oiseau aux haltères",m:"Haltères légers, buste penché",g:"Arrière d'épaule",c:"Buste penché à 45°, dos droit, charge très légère.",
+    d:["Debout, pieds à largeur de bassin, genoux légèrement fléchis, un haltère léger dans chaque main.","Penche le buste vers l'avant à environ 45°, dos bien droit, jamais arrondi.","Bras pendants sous la poitrine, coudes légèrement fléchis et fixes.","Écarte les bras sur les côtés jusqu'à l'alignement des épaules, comme si tu ouvrais des ailes.","Serre les omoplates 1 seconde en haut, puis redescends lentement."],
+    e:"Charge très légère, 12 à 15 reps : si tu dois tirer avec le dos ou te redresser, c'est trop lourd."},
+  '17':{cat:"Épaules",mu:"Trapèzes supérieurs",n:"Shrug",m:"Haussements d'épaules (haltères ou machine)",g:"Trapèzes",c:"Monte les épaules vers les oreilles, 1 s en haut.",
+    d:["Debout, bras tendus le long du corps, charge en mains.","Monte les épaules droit vers les oreilles, sans rouler.","Tiens 1 seconde en haut.","Redescends lentement jusqu'à l'étirement.","Garde la tête et le cou immobiles."],
+    e:"Faire des rotations d'épaules avec la charge n'apporte rien et fatigue l'articulation."},
+  // JAMBES
+  '20':{cat:"Jambes",mu:"Quadriceps et fessiers — aussi ischio-jambiers",n:"Leg Press",m:"Presse à cuisses (46 kg à vide sur la Technogym)",g:"Quadriceps / fessiers",c:"Dos et bassin collés, genoux à 90°, pousse avec les talons.",
+    d:["Règle le siège pour avoir les genoux à environ 90° au départ, sans que le bas du dos décolle.","Pieds à largeur d'épaules au milieu de la plateforme, pointes légèrement vers l'extérieur.","Mains sur les poignées, dos et bassin collés au dossier.","Pousse avec les talons, genoux dans l'axe des pieds, sans verrouiller en fin de mouvement.","Reviens en 2 à 3 s, sans laisser la charge taper en bout de course."],
+    e:"Pieds hauts = plus de fessiers et d'ischios ; pieds bas = plus de quadriceps."},
+  '21':{cat:"Jambes",mu:"Quadriceps (isolation)",n:"Leg Extension",m:"Extension des jambes assis",g:"Quadriceps",c:"Axe machine aligné avec les genoux, contraction 1 s en haut.",
+    d:["Règle le dossier pour que l'axe de rotation soit aligné avec tes genoux.","Le boudin se place juste au-dessus des chevilles.","Tiens les poignées latérales pour rester calé au fond du siège.","Tends les jambes en expirant, serre les quadriceps 1 seconde en haut.","Redescends lentement, sans laisser la charge retomber."],
+    e:"À éviter ou à faire très léger si les genoux sont douloureux."},
+  '22':{cat:"Jambes",mu:"Ischio-jambiers — aussi mollets",n:"Leg Curl",m:"Ischios assis ou allongé",g:"Ischio-jambiers",c:"Retour lent en 2 à 3 s, important pour la course.",
+    d:["Genoux alignés avec l'axe de la machine, boudin juste au-dessus des talons.","Version assise : abaisse bien le coussin sur les cuisses pour ne pas décoller.","Plie les jambes au maximum en expirant.","Marque un temps en position fléchie.","Remonte lentement en 2 à 3 secondes."],
+    e:"Ne décolle pas le bassin : si les fesses se soulèvent, baisse la charge."},
+  '23':{cat:"Jambes",mu:"Moyen fessier et petit fessier (abducteurs)",n:"Hip Abduction",m:"Machine abducteurs (écarter)",g:"Moyen fessier",c:"Buste légèrement en avant, ouverture contrôlée.",
+    d:["Assieds-toi au fond, coussins contre l'extérieur des genoux.","Penche très légèrement le buste vers l'avant pour mieux cibler les fessiers.","Écarte les jambes en contrôlant, sans à-coups.","Tiens 1 seconde en position ouverte.","Referme lentement sans laisser les plaques se toucher."],
+    e:"Mouvement lent : c'est un exercice où la vitesse fait tout perdre."},
+  '24':{cat:"Jambes",mu:"Adducteurs (intérieur des cuisses)",n:"Hip Adduction",m:"Machine adducteurs (serrer)",g:"Adducteurs",c:"Amplitude complète, sans à-coups.",
+    d:["Assieds-toi au fond, coussins contre l'intérieur des cuisses.","Pars d'une ouverture confortable, jamais d'un grand écart forcé.","Serre les jambes en expirant.","Tiens 1 seconde jambes serrées.","Rouvre lentement en contrôlant l'étirement."],
+    e:"Si ça tire dans l'aine, réduis l'amplitude de départ."},
+  '25':{cat:"Jambes",mu:"Mollets (jumeaux et soléaire)",n:"Calf Raise",m:"Mollets debout ou sur la presse",g:"Mollets",c:"Étirement complet en bas, 1 s en haut, sans rebond.",
+    d:["Avant des pieds sur le rebord, talons dans le vide.","Descends les talons au maximum pour étirer le mollet.","Monte le plus haut possible sur la pointe des pieds.","Tiens 1 seconde en haut.","Mouvement lent, sans rebond, jambes quasi tendues."],
+    e:"Sur la presse : ne verrouille pas les genoux, seules les chevilles travaillent."},
+  '26':{cat:"Jambes",mu:"Quadriceps et fessiers — aussi adducteurs",n:"Hack Squat",m:"Machine à squat guidée",g:"Quadriceps",c:"Dos plaqué, genoux dans l'axe des pieds.",
+    d:["Dos et épaules bien calés contre les coussins.","Pieds à largeur d'épaules, au milieu de la plateforme.","Déverrouille les sécurités, descends jusqu'à ce que les cuisses soient parallèles.","Genoux dans l'axe des pieds, talons au contact.","Pousse avec les talons sans verrouiller les genoux en haut."],
+    e:"Ne descends pas plus bas que ce que ton dos peut tenir plaqué."},
+  '27':{cat:"Jambes",mu:"Grand fessier — aussi ischio-jambiers",n:"Glute Bridge machine",m:"Hip Thrust machine",g:"Fessiers",c:"Menton rentré, pousse avec les talons, serre 1 s en haut.",
+    d:["Cale le coussin sur le haut des cuisses, pas sur le ventre.","Pieds à plat, tibias verticaux quand tu es en position haute.","Menton rentré, regard vers l'avant.","Pousse le bassin vers le haut avec les talons, serre les fessiers 1 seconde.","Redescends en contrôlant sans relâcher complètement."],
+    e:"N'hyperextends pas le bas du dos en haut : c'est le fessier qui monte le bassin."},
+  '28':{cat:"Jambes",mu:"Quadriceps, fessiers et ischios — aussi gainage et équilibre",n:"Fentes",m:"Haltères ou au poids du corps",g:"Jambes",c:"Genou avant dans l'axe du pied, buste droit.",
+    d:["Debout, pieds à largeur de bassin, buste droit et abdos serrés.","Fais un grand pas en avant.","Descends le genou arrière vers le sol sans le toucher.","Genou avant dans l'axe du pied, il ne dépasse pas trop la pointe.","Pousse sur le talon avant pour revenir, puis change de jambe."],
+    e:"À éviter en cas de douleur au genou."},
+  // TRONC
+  '30':{cat:"Tronc",mu:"Gaine abdominale complète (transverse, grands droits, obliques) — aussi fessiers et épaules",n:"Gainage planche",m:"Au sol sur les avant-bras (durée en secondes)",g:"Abdos",c:"Corps aligné, abdos et fessiers serrés, respiration normale.",
+    d:["En appui sur les avant-bras, coudes juste sous les épaules.","Pieds écartés à largeur de bassin, appui sur la pointe des pieds.","Corps aligné de la tête aux talons : ni fesses en l'air, ni dos creusé.","Serre les abdos et les fessiers, rentre légèrement le menton.","Respire normalement, sans bloquer, pendant toute la durée."],
+    e:"Mieux vaut 30 s parfaites que 60 s avec le bassin qui s'affaisse."},
+  '31':{cat:"Tronc",mu:"Grands droits de l'abdomen",n:"Abdominal Crunch",m:"Machine abdos",g:"Abdos",c:"Enroule le buste, expire en fermant.",
+    d:["Règle le siège pour que le coussin arrive sur le haut de la poitrine.","Attrape les poignées, pieds calés.","Enroule le buste vers l'avant, comme pour rapprocher le sternum du nombril.","Expire en fermant, marque un temps.","Reviens lentement sans relâcher complètement la tension."],
+    e:"Ne tire pas avec les bras : ce sont les abdos qui referment le buste."},
+  '32':{cat:"Tronc",mu:"Obliques",n:"Rotary Torso",m:"Machine obliques",g:"Obliques",c:"Bassin fixe, rotation lente, charge légère.",
+    d:["Cale bien le bassin et les cuisses, ils ne doivent pas tourner.","Buste droit, abdos engagés.","Tourne le haut du corps lentement d'un côté.","Marque un temps, puis reviens en contrôlant.","Fais le même nombre de reps des deux côtés."],
+    e:"Charge légère : la colonne n'aime pas les rotations lourdes et rapides."},
+  '33':{cat:"Tronc",mu:"Lombaires (érecteurs du rachis) — aussi fessiers et ischios",n:"Lombaires",m:"Banc à lombaires / Back Extension",g:"Lombaires",c:"Remonte jusqu'à l'alignement, jamais en hyperextension.",
+    d:["Règle le banc pour que le bord du coussin soit au niveau des hanches.","Chevilles bien calées, bras croisés sur la poitrine.","Descends lentement en gardant le dos droit.","Remonte jusqu'à l'alignement du buste avec les jambes, pas plus.","Mouvement lent, sans à-coups."],
+    e:"Ne remonte pas en cambrant : on s'arrête à l'horizontale."},
+  '34':{cat:"Tronc",mu:"Bas des abdominaux et fléchisseurs de hanche",n:"Relevé de jambes",m:"Chaise romaine",g:"Abdos bas",c:"Pas d'élan, dos plaqué au dossier.",
+    d:["Avant-bras sur les coussins, dos bien plaqué au dossier.","Épaules basses, tu ne t'affaisses pas dans les épaules.","Monte les genoux vers la poitrine en expirant.","Marque un temps en haut, bassin légèrement enroulé.","Redescends lentement, sans balancer."],
+    e:"Si tu te balances, plie davantage les genoux et ralentis."},
+  '35':{cat:"Tronc",mu:"Bas des abdominaux et fléchisseurs de hanche",n:"Relevé de jambes au sol",m:"Au sol sur le dos, sur un tapis",g:"Abdos bas",c:"Bas du dos plaqué au sol, descente contrôlée.",
+    d:["Allonge-toi sur le dos, mains à plat sous les fesses ou le long du corps.","Plaque le bas du dos au sol : il ne doit jamais se creuser.","Jambes tendues ou légèrement fléchies, monte-les jusqu'à la verticale.","Enroule légèrement le bassin en fin de montée pour finir sur les abdos bas.","Redescends lentement, et arrête-toi avant que le bas du dos décolle."],
+    e:"Si le dos se creuse, plie davantage les genoux ou réduis l'amplitude."},
+  // CARDIO / ECHAUFFEMENT (RR = minutes)
+  '40':{cat:"Cardio et échauffement",mu:"Corps entier à faible intensité, mise en route cardio et articulaire",n:"Échauffement cardio",m:"Vélo, rameur ou elliptique (RR = minutes)",g:"Échauffement",c:"Allure modérée, tu dois pouvoir parler.",
+    d:["Choisis une machine sans impact : vélo, elliptique ou rameur.","Commence très facile les 2 premières minutes.","Monte progressivement jusqu'à une allure modérée où tu peux encore parler.","Termine par quelques rotations d'épaules, de hanches et de chevilles.","Fais une série légère sur le premier exercice avant d'attaquer les charges."],
+    e:"Un échauffement trop intense grille l'énergie de la séance."},
+  '41':{cat:"Cardio et échauffement",mu:"Jambes, dos et bras — cardio complet sans impact",n:"Rameur",m:"Concept2 (RR = minutes)",g:"Cardio",c:"Jambes, buste, bras, puis l'inverse au retour.",
+    d:["Pieds sanglés, talons bas, prise large et souple sur la poignée.","Départ jambes fléchies, bras tendus, buste légèrement en avant.","Pousse d'abord avec les jambes, puis bascule le buste, puis tire les bras vers le bas des côtes.","Retour dans l'ordre inverse : bras, buste, jambes.","Cadence régulière, autour de 22 à 26 coups par minute."],
+    e:"À éviter en cas de douleur au genou : la position de départ est très fléchie."},
+  '42':{cat:"Cardio et échauffement",mu:"Jambes et système cardio-respiratoire",n:"Tapis",m:"Course ou marche inclinée (RR = minutes)",g:"Cardio",c:"Foulée souple, cadence élevée.",
+    d:["Commence par 2 min de marche pour te régler.","Foulée souple, pose de pied sous le bassin, cadence élevée plutôt que grandes enjambées.","Regard devant, épaules relâchées, sans t'accrocher aux barres.","Pour du fractionné : alterne 1 min rapide et 2 min de récupération.","Termine par 2 à 3 min de marche."],
+    e:"En marche inclinée, garde le buste droit sans t'appuyer sur la console."},
+  '43':{cat:"Cardio et échauffement",mu:"Quadriceps et fessiers — cardio sans impact",n:"Vélo",m:"Vélo d'appartement (RR = minutes)",g:"Cardio",c:"Résistance modérée, 80 à 90 tours/min.",
+    d:["Règle la selle : jambe presque tendue quand la pédale est en bas.","Résistance modérée, cadence de 80 à 90 tours par minute.","Dos droit ou légèrement penché, épaules relâchées.","Pédalage souple et rond, sans à-coups.","Selle un peu plus haute et résistance faible si les genoux sont sensibles."],
+    e:"Une selle trop basse est la première cause de douleur au genou sur vélo."},
+  '44':{cat:"Souplesse",mu:"Étirement des muscles travaillés dans la séance",n:"Étirements",m:"Retour au calme (RR = minutes)",g:"Souplesse",c:"30 s par position, sans forcer.",
+    d:["Étire les muscles que tu viens de travailler, 30 s par position.","Pecs : bras à 90° contre un montant, pivote le buste.","Dos et épaules : bras tendu ramené contre la poitrine.","Quadriceps : talon vers les fesses ; ischios : jambe tendue sur un banc, buste en avant dos droit.","Respire lentement, ne cherche jamais la douleur."],
+    e:"Pas de rebonds : on tient la position immobile."}
+};
+var TIME_BASED = {'30':1,'40':1,'41':1,'42':1,'43':1,'44':1};
+
+/* ---------- STOCKAGE ---------- */
+var KEY='fp_training_v1';
+function load(){ try{ var r=localStorage.getItem(KEY); return r?JSON.parse(r):{hist:[],current:null}; }catch(e){ return {hist:[],current:null}; } }
+function save(d){ try{ localStorage.setItem(KEY,JSON.stringify(d)); }catch(e){} }
+var DB=load();
+
+/* ---------- PARSING DU CODE ---------- */
+function chunk(tok,size){
+  var out=[];
+  for(var i=0;i<tok.length;i+=size){
+    var g=tok.substr(i,size);
+    var id=g.substr(0,2), sets=+g.substr(2,1), reps=+g.substr(3,2), rest=+g.substr(5,1);
+    var kg=(size===9)? +g.substr(6,3) : null;
+    if(!EX[id]) return {err:"Exercice inconnu : "+id};
+    out.push({id:id,sets:sets<1?1:sets,reps:reps,rest:rest*15,kg:kg});
+  }
+  return {list:out};
+}
+function parseCode(code){
+  var toks=(code||'').split(/[^0-9]+/).filter(Boolean);
+  if(!toks.length) return {err:"Code vide."};
+  var list=[];
+  for(var i=0;i<toks.length;i++){
+    var t=toks[i], size;
+    if(t.length%6===0 && t.length%9!==0) size=6;
+    else if(t.length%9===0 && t.length%6!==0) size=9;
+    else if(t.length%6===0) size=6;
+    else return {err:"Groupe invalide ("+t.length+" chiffres) : "+t};
+    var r=chunk(t,size);
+    if(r.err) return r;
+    list=list.concat(r.list);
+  }
+  return {list:list,code:toks.join(' ')};
+}
+
+/* ---------- RENDU DE LA SEANCE ---------- */
+var elSeance=document.getElementById('tab-seance');
+
+function renderSession(){
+  var cur=DB.current;
+  if(!cur){
+    elSeance.innerHTML='<div class="block"><h2>Aucune séance chargée</h2><p class="hint">Va dans l\'onglet Code et colle le code de ta séance.</p></div>';
+    return;
+  }
+  var html='<div class="block"><h2>'+(cur.title||'Séance')+'</h2><p class="hint">'+cur.date+' — code '+cur.code+'</p></div>';
+  cur.list.forEach(function(it,ix){
+    var e=EX[it.id], t=TIME_BASED[it.id];
+    var unit = (it.id>='40') ? ' min' : (t ? ' s' : ' reps');
+    var done=(it.log||[]).filter(function(s){return s&&s.ok;}).length;
+    html+='<div class="block ex'+(done===it.sets?' complete':'')+'" data-ix="'+ix+'">'+
+      '<h2><span class="num">'+(ix+1)+'</span>'+e.n+'</h2>'+
+      '<p class="machine">'+e.m+'<span class="tag">'+e.g+'</span></p>'+
+      '<p class="mus"><b>Muscles :</b> '+(e.mu||e.g)+'</p>'+
+      '<p class="target">'+it.sets+' × '+it.reps+unit+' <small>repos '+fmt(it.rest)+(it.kg?' — objectif '+it.kg+' kg':'')+'</small></p>'+
+      '<details class="exd"><summary>'+e.c+'</summary><ol class="steps">'+((e.d||[]).map(function(x){return '<li>'+x+'</li>';}).join(''))+'</ol>'+(e.e?'<p class="warn">'+e.e+'</p>':'')+'</details>'+
+      lastPerf(it)+
+      '<details class="exd swap"><summary>⇄ Remplacer cet exercice</summary>'+
+        '<select data-sw="'+ix+'" style="width:100%;padding:8px;margin-top:8px;border-radius:8px">'+swapOptions(it.id)+'</select>'+
+        '<p class="hint">Séries, reps et repos sont conservés. Utile quand la machine est prise.</p></details>'+
+      '<table class="sets"><tr><th>Série</th><th>kg</th><th>'+(t?'Durée':'Reps')+'</th><th></th></tr>';
+    for(var s=0;s<it.sets;s++){
+      var l=(it.log&&it.log[s])||{};
+      html+='<tr>'+
+        '<td>'+(s+1)+'</td>'+
+        '<td><input type="number" step="0.5" min="0" placeholder="'+(it.kg?it.kg:'—')+'" data-f="kg" data-ix="'+ix+'" data-s="'+s+'" value="'+(l.kg!=null?l.kg:'')+'"></td>'+
+        '<td><input type="number" step="1" min="0" placeholder="'+it.reps+'" data-f="reps" data-ix="'+ix+'" data-s="'+s+'" value="'+(l.reps!=null?l.reps:'')+'">'+
+          (t?' <button class="run" data-run="'+ix+'" title="Lancer le chrono">⏱</button>':'')+'</td>'+
+        '<td><button class="chk" data-ix="'+ix+'" data-s="'+s+'" aria-pressed="'+(l.ok?'true':'false')+'">✓</button></td>'+
+      '</tr>';
+    }
+    html+='</table></div>';
+  });
+  html+='<div class="block"><h2>Notes de séance</h2><textarea id="notes" style="min-height:70px" placeholder="Sensations, douleurs, fatigue...">'+(cur.notes||'')+'</textarea>'+
+        '<div class="row"><button class="act" id="finishBtn">Terminer et enregistrer</button></div></div>';
+  elSeance.innerHTML=html;
+}
+
+function fmt(s){ return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+
+/* dernière perf sur cet exercice, trouvée dans l'historique */
+function lastPerf(it){
+  var prev=null;
+  for(var i=0;i<DB.hist.length && !prev;i++){
+    (DB.hist[i].list||[]).forEach(function(p){
+      if(!prev && p.id===it.id && (p.log||[]).some(function(l){return l&&(l.ok||l.kg!=null||l.reps!=null);}))
+        prev={s:DB.hist[i],it:p};
+    });
+  }
+  if(!prev) return '<p class="hint">Première fois enregistrée sur cet exercice.</p>';
+  var t=TIME_BASED[it.id], kgs=[], allOk=true, maxKg=null;
+  for(var s=0;s<prev.it.sets;s++){
+    var l=(prev.it.log||[])[s]||{};
+    var rp=(l.reps!=null?l.reps:(l.ok?prev.it.reps:'—'));
+    kgs.push((l.kg!=null?l.kg+'kg ':'')+'x'+rp);
+    if(!l.ok || (l.reps!=null && l.reps<prev.it.reps)) allOk=false;
+    if(l.kg!=null && (maxKg==null||l.kg>maxKg)) maxKg=l.kg;
+  }
+  var txt='<b>Dernière fois</b> ('+prev.s.date.split(' ')[0]+') : '+kgs.join(' | ');
+  if(allOk){
+    if(maxKg!=null) txt+=' → tout bouclé, tente '+(maxKg+2.5)+' kg';
+    else if(t) txt+=' → tout bouclé, allonge un peu la durée';
+    else txt+=' → tout bouclé, monte la charge';
+  } else txt+=' → reste sur la même charge et boucle toutes les séries';
+  return '<p class="hint prev">'+txt+'</p>';
+}
+
+/* liste déroulante de remplacement : même groupe musculaire en premier */
+function swapOptions(curId){
+  var g=EX[curId]?EX[curId].g:'', keys=Object.keys(EX).sort(), same=[], other=[];
+  keys.forEach(function(k){
+    var o='<option value="'+k+'"'+(k===curId?' selected':'')+'>'+EX[k].n+' ('+k+')</option>';
+    (EX[k].g===g?same:other).push(o);
+  });
+  return '<optgroup label="'+(g||'Même groupe')+'">'+same.join('')+'</optgroup>'+
+         '<optgroup label="Autres exercices">'+other.join('')+'</optgroup>';
+}
+elSeance.addEventListener('change',function(ev){
+  var sel=ev.target; if(!sel.dataset||!sel.dataset.sw||!DB.current) return;
+  var it=DB.current.list[+sel.dataset.sw];
+  if(sel.value===it.id) return;
+  it.id=sel.value; it.kg=null; it.log=[];
+  save(DB); renderSession();
+});
+
+/* ---------- INTERACTIONS SEANCE ---------- */
+elSeance.addEventListener('click',function(ev){
+  var r=ev.target.closest('.run');
+  if(r&&DB.current){
+    var itr=DB.current.list[+r.dataset.run];
+    var secs=(itr.id>='40')? itr.reps*60 : itr.reps;
+    startTimer(secs,'Effort en cours');
+    return;
+  }
+  var b=ev.target.closest('.chk'); if(!b||!DB.current) return;
+  var ix=+b.dataset.ix, s=+b.dataset.s, it=DB.current.list[ix];
+  it.log=it.log||[]; it.log[s]=it.log[s]||{};
+  it.log[s].ok=!it.log[s].ok;
+  if(it.log[s].ok && it.log[s].reps==null) it.log[s].reps=it.reps;
+  save(DB);
+  var doneAll=it.log.filter(function(x){return x&&x.ok;}).length===it.sets;
+  b.setAttribute('aria-pressed',it.log[s].ok);
+  b.closest('.block').classList.toggle('complete',doneAll);
+  if(it.log[s].ok && !doneAll) startTimer(it.rest);
+  else if(it.log[s].ok) stopTimer('Exercice terminé');
+});
+elSeance.addEventListener('input',function(ev){
+  var el=ev.target; if(!DB.current) return;
+  if(el.id==='notes'){ DB.current.notes=el.value; save(DB); return; }
+  if(!el.dataset.f) return;
+  var it=DB.current.list[+el.dataset.ix], s=+el.dataset.s;
+  it.log=it.log||[]; it.log[s]=it.log[s]||{};
+  it.log[s][el.dataset.f]= el.value===''?null:+el.value;
+  save(DB);
+});
+elSeance.addEventListener('click',function(ev){
+  if(ev.target.id!=='finishBtn'||!DB.current) return;
+  var cur=DB.current;
+  cur.done=true;
+  DB.hist.unshift(JSON.parse(JSON.stringify(cur)));
+  DB.current=null; save(DB);
+  renderSession(); renderHist(); showTab('histo');
+});
+
+/* ---------- MINUTEUR ---------- */
+var clock=document.getElementById('clock'), label=document.getElementById('label'), t=null, left=0;
+function startTimer(sec,msg){
+  clearInterval(t); left=sec; clock.classList.remove('go');
+  clock.textContent=fmt(left); label.textContent=msg||'Repos en cours';
+  var eff=(msg==='Effort en cours');
+  t=setInterval(function(){
+    left--; clock.textContent=fmt(Math.max(left,0));
+    if(left<=0){ clearInterval(t); t=null; clock.classList.add('go'); label.textContent=eff?'Terminé, coche la série':'Série suivante';
+      if(navigator.vibrate){try{navigator.vibrate([200,100,200]);}catch(e){}} }
+  },1000);
+}
+function stopTimer(msg){ clearInterval(t); t=null; left=0; clock.textContent='0:00'; clock.classList.remove('go'); label.textContent=msg||'Coche une série pour lancer le repos'; }
+document.getElementById('resetT').addEventListener('click',function(){stopTimer();});
+
+/* ---------- ONGLETS ---------- */
+function showTab(name){
+  ['seance','code','histo','lib','prog'].forEach(function(n){
+    document.getElementById('tab-'+n).classList.toggle('hidden',n!==name);
+  });
+  document.querySelectorAll('nav button').forEach(function(b){ b.classList.toggle('on',b.dataset.tab===name); });
+  if(name==='histo'){ renderHist(); buildExport(); }
+  if(name==='prog'){ renderProg(); }
+}
+document.querySelectorAll('nav button').forEach(function(b){
+  b.addEventListener('click',function(){ showTab(b.dataset.tab); });
+});
+
+/* ---------- CHARGEMENT DU CODE ---------- */
+document.getElementById('loadBtn').addEventListener('click',function(){
+  var r=parseCode(document.getElementById('codeIn').value);
+  var msg=document.getElementById('codeMsg');
+  if(r.err){ msg.textContent=r.err; return; }
+  var d=new Date();
+  DB.current={code:r.code,list:r.list,notes:'',
+    date:d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+    title:'Séance du '+d.toLocaleDateString('fr-FR')};
+  save(DB); msg.textContent='Séance chargée.'; renderSession(); showTab('seance');
+});
+document.getElementById('demoBtn').addEventListener('click',function(){
+  document.getElementById('codeIn').value='400070 014108 023126 033106 043124 053154 063124';
+});
+
+/* ---------- HISTORIQUE ET EXPORT ---------- */
+function sessionText(s){
+  var out=['=== '+s.date+' (code '+s.code+') ==='];
+  s.list.forEach(function(it){
+    var e=EX[it.id], line=e.n+' : ';
+    var parts=(it.log||[]).map(function(l,i){
+      if(!l||(!l.ok&&l.kg==null&&l.reps==null)) return null;
+      var kg=(l.kg!=null?l.kg+'kg':'—');
+      var rp=(l.reps!=null?l.reps:it.reps);
+      return kg+' x'+rp;
+    }).filter(Boolean);
+    out.push(line+(parts.length?parts.join(' | '):'non réalisé'));
+  });
+  if(s.notes) out.push('Notes : '+s.notes);
+  return out.join('\n');
+}
+function buildExport(){
+  var txt=DB.hist.map(sessionText).join('\n\n');
+  if(DB.current) txt=sessionText(DB.current)+(txt?'\n\n'+txt:'');
+  document.getElementById('exportBox').value=txt||'Aucune donnée pour le moment.';
+  return txt;
+}
+function renderHist(){
+  var el=document.getElementById('histList');
+  if(!DB.hist.length){ el.innerHTML='<p class="hint">Rien d\'enregistré pour l\'instant.</p>'; return; }
+  el.innerHTML=DB.hist.map(function(s,i){
+    return '<div class="hist"><b>'+s.date+'</b><br><span class="hint">'+s.list.length+' exercices — code '+s.code+'</span></div>';
+  }).join('');
+}
+var saver=null;
+if(window.claude && typeof window.claude.use==='function'){
+  Promise.resolve(window.claude.use('downloads')).then(function(d){ saver=d; }).catch(function(){});
+}
+document.getElementById('dlBtn').addEventListener('click',function(){
+  var txt=buildExport();
+  var name='perfs-'+new Date().toISOString().slice(0,10)+'.txt';
+  if(saver && typeof saver.save==='function'){
+    Promise.resolve(saver.save({filename:name,data:txt})).catch(function(){
+      alert("Téléchargement refusé ou indisponible, utilise le bouton Copier.");
+    });
+    return;
+  }
+  try{
+    var blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1000);
+  }catch(e){ alert("Téléchargement impossible ici, utilise le bouton Copier."); }
+});
+document.getElementById('copyBtn').addEventListener('click',function(){
+  var box=document.getElementById('exportBox');
+  box.select(); box.setSelectionRange(0,999999);
+  try{ document.execCommand('copy'); this.textContent='Copié !'; var b=this; setTimeout(function(){b.textContent='Copier';},1500); }catch(e){}
+});
+document.getElementById('clearBtn').addEventListener('click',function(){
+  if(confirm('Effacer tout l\'historique ?')){ DB={hist:[],current:DB.current}; save(DB); renderHist(); buildExport(); }
+});
+
+/* ---------- PROGRESSION ---------- */
+/* Pour chaque exercice : une valeur par séance (charge max, ou durée/reps si pas de kg) */
+function progData(id){
+  var all=(DB.current?[DB.current]:[]).concat(DB.hist), pts=[];
+  all.forEach(function(s){
+    (s.list||[]).forEach(function(it){
+      if(it.id!==id) return;
+      var best=null, reps=0, unit='kg';
+      (it.log||[]).forEach(function(l){
+        if(!l) return;
+        if(l.kg!=null){ if(best==null||l.kg>best) best=l.kg; }
+        var r=(l.reps!=null?l.reps:(l.ok?it.reps:0));
+        if(r>reps) reps=r;
+      });
+      if(best==null){
+        if(!reps) return;
+        best=reps; unit=TIME_BASED[id]?'s':'reps';
+      }
+      pts.push({d:s.date.split(' ')[0],v:best,u:unit,r:reps});
+    });
+  });
+  return pts.reverse(); /* du plus ancien au plus récent */
+}
+function chartSVG(pts){
+  var W=320,H=150,pl=38,pr=10,pt=12,pb=26;
+  var vals=pts.map(function(p){return p.v;});
+  var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+  if(mx===mn){ mx=mn+(mn?mn*0.1:1); mn=Math.max(0,mn-(mn?mn*0.1:1)); }
+  var x=function(i){ return pl+(pts.length<2?(W-pl-pr)/2:i*(W-pl-pr)/(pts.length-1)); };
+  var y=function(v){ return pt+(mx-v)*(H-pt-pb)/(mx-mn); };
+  var g='';
+  [0,0.5,1].forEach(function(f){
+    var v=mn+(mx-mn)*f, yy=y(v);
+    g+='<line x1="'+pl+'" y1="'+yy+'" x2="'+(W-pr)+'" y2="'+yy+'" stroke="currentColor" stroke-opacity=".15"/>'+
+       '<text x="'+(pl-6)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="currentColor" fill-opacity=".6">'+(Math.round(v*10)/10)+'</text>';
+  });
+  var path=pts.map(function(p,i){ return (i?'L':'M')+x(i)+' '+y(p.v); }).join(' ');
+  var dots=pts.map(function(p,i){
+    return '<circle cx="'+x(i)+'" cy="'+y(p.v)+'" r="4" fill="var(--plate)"><title>'+p.d+' : '+p.v+' '+p.u+'</title></circle>'+
+      '<text x="'+x(i)+'" y="'+(y(p.v)-9)+'" text-anchor="middle" font-size="10" fill="currentColor">'+p.v+'</text>';
+  }).join('');
+  var labs=pts.map(function(p,i){
+    if(pts.length>6 && i%2) return '';
+    return '<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="currentColor" fill-opacity=".6">'+p.d.slice(0,5)+'</text>';
+  }).join('');
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" style="color:var(--ink)">'+g+
+    '<path d="'+path+'" fill="none" stroke="var(--plate)" stroke-width="2.5" stroke-linejoin="round"/>'+dots+labs+'</svg>';
+}
+function renderProg(){
+  var el=document.getElementById('progList'), out={}, any=false;
+  Object.keys(EX).sort().forEach(function(k){
+    var pts=progData(k);
+    if(!pts.length) return;
+    any=true;
+    var c=EX[k].cat||'Divers';
+    var first=pts[0].v, last=pts[pts.length-1].v, diff=Math.round((last-first)*10)/10;
+    var trend=pts.length<2?'1re séance':(diff>0?'+'+diff+' '+pts[0].u:(diff<0?diff+' '+pts[0].u:'stable'));
+    (out[c]=out[c]||[]).push(
+      '<details class="exd"><summary><span class="code">'+k+'</span> <b>'+EX[k].n+'</b>'+
+      '<span class="tag">'+trend+'</span><br><span class="hint">'+pts.length+' séance'+(pts.length>1?'s':'')+
+      ' — dernière : '+last+' '+pts[pts.length-1].u+'</span></summary>'+
+      chartSVG(pts)+'</details>');
+  });
+  if(!any){ el.innerHTML='<p class="hint">Aucune donnée pour l\'instant. Termine une séance et les courbes apparaîtront ici.</p>'; return; }
+  var cats=GRP_ORDER.filter(function(c){return out[c];})
+    .concat(Object.keys(out).filter(function(c){return GRP_ORDER.indexOf(c)<0;}));
+  el.innerHTML=cats.map(function(c){ return '<h3 class="grp">'+c+'</h3>'+out[c].join(''); }).join('');
+}
+
+/* ---------- BIBLIOTHEQUE ---------- */
+var GRP_ORDER=['Pectoraux','Épaules','Dos','Bras','Jambes','Tronc','Cardio et échauffement','Souplesse'];
+(function(){
+  var byCat={};
+  Object.keys(EX).sort().forEach(function(k){
+    var c=EX[k].cat||'Divers';
+    (byCat[c]=byCat[c]||[]).push(k);
+  });
+  var cats=GRP_ORDER.filter(function(c){return byCat[c];})
+    .concat(Object.keys(byCat).filter(function(c){return GRP_ORDER.indexOf(c)<0;}));
+  document.getElementById('libTable').innerHTML=cats.map(function(c){
+    return '<h3 class="grp">'+c+'</h3>'+byCat[c].map(function(k){
+      var e=EX[k];
+      var steps=(e.d||[]).map(function(x){return '<li>'+x+'</li>';}).join('');
+      return '<details class="exd"><summary><span class="code">'+k+'</span> <b>'+e.n+'</b>'+
+        '<span class="tag">'+e.g+'</span><br><span class="hint">'+e.m+'</span></summary>'+
+        '<p class="mus"><b>Muscles :</b> '+(e.mu||e.g)+'</p>'+
+        '<ol class="steps">'+steps+'</ol>'+
+        (e.e?'<p class="warn">'+e.e+'</p>':'')+
+        '</details>';
+    }).join('');
+  }).join('');
+})();
+
+/* ---------- INIT ---------- */
+renderSession(); renderHist(); buildExport();
+})();
+</script>
+</body>
+</html>
