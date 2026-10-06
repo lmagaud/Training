@@ -148,6 +148,15 @@ if('serviceWorker' in navigator){
       <p class="hint" id="codeMsg"></p>
     </div>
     <div class="block">
+      <h2>Importer un historique</h2>
+      <p class="hint">Colle un export de séances (le texte en <b>=== date (code …) ===</b>) pour le réinjecter dans l'historique. Les séances déjà présentes à la même date ne sont pas dupliquées.</p>
+      <textarea id="importBox" rows="5" placeholder="=== 05/10/2026 18:24 (code 401050 …) ===&#10;Lat Pulldown machine : 70kg x10 | …"></textarea>
+      <div class="row">
+        <button class="act" id="importBtn">Importer</button>
+      </div>
+      <p class="hint" id="importMsg"></p>
+    </div>
+    <div class="block">
       <h2>Format du code</h2>
       <p class="hint">Chaque exercice = 6 chiffres : <b>EE S RR T</b>, ou 9 chiffres avec la charge : <b>EE S RR T KKK</b></p>
       <ul class="hint">
@@ -542,6 +551,58 @@ document.getElementById('loadBtn').addEventListener('click',function(){
 });
 document.getElementById('demoBtn').addEventListener('click',function(){
   document.getElementById('codeIn').value='400070 014108 023126 033106 043124 053154 063124';
+});
+
+/* ---------- IMPORT D'HISTORIQUE ---------- */
+function parseExport(txt){
+  var blocks=txt.split(/\n(?=\s*===)/), out=[], errs=0;
+  blocks.forEach(function(bl){
+    var lines=bl.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    if(!lines.length) return;
+    var h=lines[0].match(/^===\s*(.+?)\s*\(code\s+([0-9 ]+)\)\s*===$/);
+    if(!h){ errs++; return; }
+    var r=parseCode(h[2]);
+    if(r.err){ errs++; return; }
+    var s={code:r.code,list:r.list,notes:'',date:h[1],title:'Séance du '+h[1].split(' ')[0],done:true}, p=0;
+    lines.slice(1).forEach(function(ln){
+      var m=ln.match(/^Notes\s*:\s*(.+)$/i);
+      if(m){ s.notes=m[1]; return; }
+      m=ln.match(/^(.+?)\s*:\s*(.+)$/); if(!m) return;
+      var name=m[1].trim(), body=m[2].trim(), ix=-1;
+      for(var i=p;i<s.list.length;i++){ if(EX[s.list[i].id] && EX[s.list[i].id].n===name){ ix=i; break; } }
+      if(ix<0) for(var j=0;j<s.list.length;j++){ if(EX[s.list[j].id] && EX[s.list[j].id].n===name){ ix=j; break; } }
+      if(ix<0) return;
+      p=ix+1;
+      var it=s.list[ix]; it.log=[];
+      if(/^non réalisé/i.test(body)) return;
+      body.split('|').forEach(function(part,k){
+        var q=part.trim().match(/^(—|[\d.]+kg)\s*x\s*(\d+)$/i);
+        if(!q) return;
+        var kg=(q[1]==='—'?null:parseFloat(q[1]));
+        it.log[k]={ok:true,reps:+q[2]}; if(kg!=null) it.log[k].kg=kg;
+      });
+    });
+    out.push(s);
+  });
+  return {sessions:out,errs:errs};
+}
+document.getElementById('importBtn').addEventListener('click',function(){
+  var msg=document.getElementById('importMsg');
+  var r=parseExport(document.getElementById('importBox').value||'');
+  if(!r.sessions.length){ msg.textContent='Rien à importer'+(r.errs?' ('+r.errs+' bloc(s) illisible(s)).':'.'); return; }
+  var added=0;
+  r.sessions.forEach(function(s){
+    if(DB.hist.some(function(h){return h.date===s.date;})) return;
+    DB.hist.push(s); added++;
+  });
+  DB.hist.sort(function(a,b){
+    function k(d){ var m=d.match(/(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?/);
+      return m? m[3]+m[2]+m[1]+(m[4]||'00')+(m[5]||'00') : '0'; }
+    return k(b.date).localeCompare(k(a.date));
+  });
+  save(DB); renderHist(); buildExport();
+  msg.textContent=added+' séance(s) importée(s)'+(r.sessions.length-added?', '+(r.sessions.length-added)+' déjà présente(s)':'')+'.';
+  document.getElementById('importBox').value='';
 });
 
 /* ---------- HISTORIQUE ET EXPORT ---------- */
