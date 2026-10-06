@@ -1,7 +1,7 @@
 /* Service worker : met l'appli en cache pour qu'elle marche sans réseau.
    Quand tu modifies index.html, change le numéro de version ci-dessous
    pour forcer la mise à jour sur le téléphone. */
-const VERSION = 'training-v2';
+const VERSION = 'training-v3';
 const FILES = [
   './',
   './index.html',
