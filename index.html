@@ -146,6 +146,7 @@ if('serviceWorker' in navigator){
         <button class="act ghost" id="demoBtn">Exemple</button>
       </div>
       <p class="hint" id="codeMsg"></p>
+      <p class="hint">Astuce : si tu coches une série sans rien saisir, la charge affichée en gris est enregistrée automatiquement. Tape une valeur seulement si tu as pris autre chose.</p>
     </div>
     <div class="block">
       <h2>Importer un historique</h2>
@@ -488,6 +489,12 @@ elSeance.addEventListener('click',function(ev){
   it.log=it.log||[]; it.log[s]=it.log[s]||{};
   it.log[s].ok=!it.log[s].ok;
   if(it.log[s].ok && it.log[s].reps==null) it.log[s].reps=it.reps;
+  /* si la charge n'a pas été saisie, on reprend l'objectif du code */
+  if(it.log[s].ok && it.log[s].kg==null && it.kg!=null){
+    it.log[s].kg=it.kg;
+    var f=elSeance.querySelector('input[data-f="kg"][data-ix="'+ix+'"][data-s="'+s+'"]');
+    if(f) f.value=it.kg;
+  }
   save(DB);
   var doneAll=it.log.filter(function(x){return x&&x.ok;}).length===it.sets;
   b.setAttribute('aria-pressed',it.log[s].ok);
